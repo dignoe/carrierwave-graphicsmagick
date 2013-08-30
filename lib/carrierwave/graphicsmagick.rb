@@ -1,6 +1,6 @@
 module CarrierWave
 
-	# Most of this is has been shamelessly taken from the CarrierWave::MiniMagick module
+	# Much of this is has been shamelessly taken from the CarrierWave::MiniMagick module
 	# https://github.com/carrierwaveuploader/carrierwave
 
   module GraphicsMagick
@@ -18,6 +18,14 @@ module CarrierWave
     module ClassMethods
       def convert(format)
         process :convert => format
+      end
+
+      def auto_orient
+      	process :auto_orient
+      end
+
+      def strip
+      	process :strip
       end
 
       def resize_to_limit(width, height)
@@ -51,9 +59,30 @@ module CarrierWave
     #     image.convert(:png)
     #
     def convert(format)
-      @format = format
       manipulate! do |img|
         img.format(format.to_s.downcase)
+        img = yield(img) if block_given?
+        img
+      end
+    end
+
+    ##
+    # Auto rotates the file (useful for images taken with a digital camera)
+    #
+    def auto_orient
+    	manipulate! do |img|
+        img.auto_orient
+        img = yield(img) if block_given?
+        img
+      end
+    end
+
+    ##
+    # Remove all profiles and text attributes from the image
+    #
+    def strip
+    	manipulate! do |img|
+        img.strip
         img = yield(img) if block_given?
         img
       end
@@ -131,9 +160,13 @@ module CarrierWave
     end
 
     ##
-    # Manipulate the image with GraphicsMagick. This method will load up an image
-    # and then pass each of its frames to the supplied block. It will then
-    # save the image to disk.
+    # Manipulate the image with GraphicsMagick. This method will pass the image
+    # to the supplied block. It will NOT save the image to disk by default. Override
+    # this by passing true as the only argument. Note: by default, the image is only
+    # saved after all processes have been run. If you are using this method to utilize
+    # Graphicsmagick utilities other than mogrify, then make sure all processes have
+    # been explicitly written to disk first, or call manipulate(true) before using
+    # built in convenience methods.
     #
     # === Gotcha
     #
@@ -142,17 +175,30 @@ module CarrierWave
     # CarrierWave::Uploader does, so you won't need to worry about this in
     # most cases.
     #
+    #
     # === Yields
     #
     # [GraphicsMagick::Image] manipulations to perform
     #
     #
-    def manipulate!
+    def manipulate!(save_image = false)
       cache_stored_file! if !cached?
-      image = ::GraphicsMagick::Image.new(current_path)
-      image.format(@format.to_s.downcase) if @format
-      image = yield(image)
-      image.write(current_path)
+      @_gimage ||= ::GraphicsMagick::Image.new(current_path)
+      @_gimage = yield(@_gimage)
+      @_image.write(current_path) if save_image
+      @_gimage
+    rescue => e
+      raise CarrierWave::ProcessingError.new("Failed to manipulate file! #{e}")
+    end
+
+
+    def process!(*)
+    	result = super
+    	if @_gimage
+    		@_gimage.write!
+    		@_gimage = nil
+    	end
+    	result
     end
   end
 end
