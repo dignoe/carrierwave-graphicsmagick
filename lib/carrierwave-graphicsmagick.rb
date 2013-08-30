@@ -1,7 +1,2 @@
-require "carrierwave-graphicsmagick/version"
-
-module CarrierWave
-  module GraphicsMagick
-    # Your code goes here...
-  end
-end
+require "carrierwave/graphicsmagick/version"
+require "carrierwave/graphicsmagick"
