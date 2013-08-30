@@ -60,7 +60,8 @@ module CarrierWave
     #
     def convert(format)
       manipulate! do |img|
-        img.format(format.to_s.downcase)
+      	@format = format
+        img.convert
         img = yield(img) if block_given?
         img
       end
@@ -195,7 +196,12 @@ module CarrierWave
     def process!(*)
     	result = super
     	if @_gimage
-    		@_gimage.write!
+    		if @format
+    			new_file = @_gimage.write("#{file.basename}.#{@format.to_s.downcase}")
+    			file = new_file.file
+    		else
+	    		@_gimage.write!
+	    	end
     		@_gimage = nil
     	end
     	result
