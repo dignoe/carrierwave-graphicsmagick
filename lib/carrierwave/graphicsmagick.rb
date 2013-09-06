@@ -194,14 +194,11 @@ module CarrierWave
 
 
     def process!(*)
-    	Rails.logger.debug "GraphicsMagick - Processing image #{file.filename}"
     	result = super
     	
     	if @_gimage
     		if @format
-    			Rails.logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
-    			Rails.logger.debug "GraphicsMagick - New file should be at #{file.basename}.#{@format.to_s.downcase}"
-    			new_file = @_gimage.write("#{file.basename}.#{@format.to_s.downcase}")
+    			new_file = @_gimage.write(File.expand_path("#{file.basename}.#{@format.to_s.downcase}", File.dirname(file.path)))
     			file.send(:"file=", new_file.file)
     		else
 	    		@_gimage.write!
