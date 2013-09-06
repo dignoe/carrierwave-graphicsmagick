@@ -16,8 +16,8 @@ module CarrierWave
     end
 
     module ClassMethods
-      def convert_b(format)
-        process :convert_b => format
+      def convert(format)
+        process :convert => format
       end
 
       def auto_orient
@@ -58,7 +58,7 @@ module CarrierWave
     #
     #     image.convert(:png)
     #
-    def convert_b(format)
+    def convert(format)
       manipulate! do |img|
       	@format = format
         img.convert
@@ -202,7 +202,7 @@ module CarrierWave
     			Rails.logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
     			Rails.logger.debug "GraphicsMagick - New file should be at #{file.basename}.#{@format.to_s.downcase}"
     			new_file = @_gimage.write("#{file.basename}.#{@format.to_s.downcase}")
-    			file.file = new_file.file
+    			file.send(:"file=", new_file.file)
     		else
 	    		@_gimage.write!
 	    	end
