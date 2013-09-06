@@ -59,7 +59,6 @@ module CarrierWave
     #     image.convert(:png)
     #
     def convert_b(format)
-    	Rails.logger.debug "GraphicsMagick#convert - new format is #{format.to_s}"
       manipulate! do |img|
       	@format = format
         img.convert
@@ -151,7 +150,6 @@ module CarrierWave
     # [GraphicsMagick::Image] additional manipulations to perform
     #
     def resize_to_fill(width, height, gravity = 'Center')
-    	Rails.logger.debug "GraphicsMagick#resize_to_fill"
       manipulate! do |img|
         img.resize("#{width}x#{height}^")
         	.gravity(gravity)
@@ -204,7 +202,7 @@ module CarrierWave
     			Rails.logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
     			Rails.logger.debug "GraphicsMagick - New file should be at #{file.basename}.#{@format.to_s.downcase}"
     			new_file = @_gimage.write("#{file.basename}.#{@format.to_s.downcase}")
-    			file = new_file.file
+    			file.file = new_file.file
     		else
 	    		@_gimage.write!
 	    	end
