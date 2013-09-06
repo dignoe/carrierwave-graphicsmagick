@@ -195,8 +195,12 @@ module CarrierWave
 
     def process!(*)
     	result = super
+    	logger.debug 'GraphicsMagick - Processing image'
+    	logger.dubug "GraphicsMagick - Image is at #{file.path}"
     	if @_gimage
     		if @format
+    			logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
+    			logger.debug "GraphicsMagick - New file should be at #{file.basename}.#{@format.to_s.downcase}"
     			new_file = @_gimage.write("#{file.basename}.#{@format.to_s.downcase}")
     			file = new_file.file
     		else
