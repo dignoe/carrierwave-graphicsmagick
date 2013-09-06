@@ -196,7 +196,7 @@ module CarrierWave
     def process!(*)
     	result = super
     	Rails.logger.debug 'GraphicsMagick - Processing image'
-    	Rails.logger.dubug "GraphicsMagick - Image is at #{file.path}"
+    	Rails.logger.debug "GraphicsMagick - Image is at #{file.path}"
     	if @_gimage
     		if @format
     			Rails.logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
