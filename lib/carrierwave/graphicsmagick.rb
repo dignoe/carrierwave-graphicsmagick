@@ -16,8 +16,8 @@ module CarrierWave
     end
 
     module ClassMethods
-      def convert(format)
-        process :convert => format
+      def convert_b(format)
+        process :convert_b => format
       end
 
       def auto_orient
@@ -58,10 +58,10 @@ module CarrierWave
     #
     #     image.convert(:png)
     #
-    def convert(format)
+    def convert_b(format)
+    	Rails.logger.debug "GraphicsMagick#convert - new format is #{format.to_s}"
       manipulate! do |img|
       	@format = format
-      	Rails.logger.debug "GraphicsMagick#convert - new format is #{@format.to_s}"
         img.convert
         img = yield(img) if block_given?
         img
@@ -151,6 +151,7 @@ module CarrierWave
     # [GraphicsMagick::Image] additional manipulations to perform
     #
     def resize_to_fill(width, height, gravity = 'Center')
+    	Rails.logger.debug "GraphicsMagick#resize_to_fill"
       manipulate! do |img|
         img.resize("#{width}x#{height}^")
         	.gravity(gravity)
@@ -195,10 +196,9 @@ module CarrierWave
 
 
     def process!(*)
+    	Rails.logger.debug "GraphicsMagick - Processing image #{file.filename}"
     	result = super
-    	Rails.logger.debug 'GraphicsMagick - Processing image'
-    	Rails.logger.debug "GraphicsMagick - Image is at #{file.path}"
-    	Rails.logger.debug "GraphicsMagick - @format is #{@format}"
+    	
     	if @_gimage
     		if @format
     			Rails.logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
