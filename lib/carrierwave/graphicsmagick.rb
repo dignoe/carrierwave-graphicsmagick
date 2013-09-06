@@ -61,6 +61,7 @@ module CarrierWave
     def convert(format)
       manipulate! do |img|
       	@format = format
+      	Rails.logger.debug "GraphicsMagick#convert - new format is #{@format.to_s}"
         img.convert
         img = yield(img) if block_given?
         img
@@ -197,6 +198,7 @@ module CarrierWave
     	result = super
     	Rails.logger.debug 'GraphicsMagick - Processing image'
     	Rails.logger.debug "GraphicsMagick - Image is at #{file.path}"
+    	Rails.logger.debug "GraphicsMagick - @format is #{@format}"
     	if @_gimage
     		if @format
     			Rails.logger.debug "GraphicsMagick - Changing formats to #{@format.to_s}"
